@@ -16,13 +16,29 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from rest_framework.routers import DefaultRouter
+
+from messaging.urls import router as messaging_router
+from payment.urls import router as payment_router
+from photo.urls import router as photo_router
+from profile.urls import router as profile_router
+from swipe.urls import router as swipe_router
+from user.urls import router as user_router
+
+# One DefaultRouter combining every app's routes, so /api/ has a single
+# browsable root that lists all endpoints.
+router = DefaultRouter()
+for app_router in (
+    user_router,
+    profile_router,
+    swipe_router,
+    photo_router,
+    payment_router,
+    messaging_router,
+):
+    router.registry.extend(app_router.registry)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('user.urls')),
-    path('api/', include('profile.urls')),
-    path('api/', include('swipe.urls')),
-    path('api/', include('photo.urls')),
-    path('api/', include('payment.urls')),
-    path('api/', include('messaging.urls')),
+    path('api/', include(router.urls)),
 ]
